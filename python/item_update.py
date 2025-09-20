@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from typing import Protocol
 from item_classifier import classify
 
 

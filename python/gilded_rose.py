@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from item_classifier import classify
-from item_update import _dec_q, _dec_sell_in, _inc_q
+from item_update_strategy import _pick_strategy
 
 
 class GildedRose(object):
@@ -12,36 +12,8 @@ class GildedRose(object):
     def update_quality(self):
         for item in self.items:
             item_type = classify(item.name)
-            if item_type == "sulfuras":
-                continue
-            if item_type == "backstage_passes":
-                _inc_q(item, 1)
-                if item.sell_in <= 10:
-                    _inc_q(item, 1)
-                if item.sell_in <= 5:
-                    _inc_q(item, 1)
-                _dec_sell_in(item)
-                if item.sell_in < 0:
-                    item.quality = 0
-                continue
-            if item_type == "aged_brie":
-                _inc_q(item, 1)
-                _dec_sell_in(item)
-                if item.sell_in < 0:
-                    _inc_q(item, 1)
-                continue
-            if item_type == "conjured":
-                _dec_q(item, 2)
-                _dec_sell_in(item)
-                if item.sell_in < 0:
-                    _dec_q(item, 2)
-                continue
-            if item_type == "normal":
-                _dec_q(item, 1)
-                _dec_sell_in(item)
-                if item.sell_in < 0:
-                    _dec_q(item, 1)
-                continue
+            item_strategy = _pick_strategy(item_type)
+            item_strategy.update(item)
 
 
 class Item:
