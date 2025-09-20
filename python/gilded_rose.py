@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+from item_classifier import classify
+from item_update import _dec_q, _dec_sell_in, _inc_q
+
+
 class GildedRose(object):
 
     def __init__(self, items):
@@ -7,33 +11,37 @@ class GildedRose(object):
 
     def update_quality(self):
         for item in self.items:
-            if item.name != "Aged Brie" and item.name != "Backstage passes to a TAFKAL80ETC concert":
-                if item.quality > 0:
-                    if item.name != "Sulfuras, Hand of Ragnaros":
-                        item.quality = item.quality - 1
-            else:
-                if item.quality < 50:
-                    item.quality = item.quality + 1
-                    if item.name == "Backstage passes to a TAFKAL80ETC concert":
-                        if item.sell_in < 11:
-                            if item.quality < 50:
-                                item.quality = item.quality + 1
-                        if item.sell_in < 6:
-                            if item.quality < 50:
-                                item.quality = item.quality + 1
-            if item.name != "Sulfuras, Hand of Ragnaros":
-                item.sell_in = item.sell_in - 1
-            if item.sell_in < 0:
-                if item.name != "Aged Brie":
-                    if item.name != "Backstage passes to a TAFKAL80ETC concert":
-                        if item.quality > 0:
-                            if item.name != "Sulfuras, Hand of Ragnaros":
-                                item.quality = item.quality - 1
-                    else:
-                        item.quality = item.quality - item.quality
-                else:
-                    if item.quality < 50:
-                        item.quality = item.quality + 1
+            item_type = classify(item.name)
+            if item_type == "sulfuras":
+                continue
+            if item_type == "backstage_passes":
+                _inc_q(item, 1)
+                if item.sell_in <= 10:
+                    _inc_q(item, 1)
+                if item.sell_in <= 5:
+                    _inc_q(item, 1)
+                _dec_sell_in(item)
+                if item.sell_in < 0:
+                    item.quality = 0
+                continue
+            if item_type == "aged_brie":
+                _inc_q(item, 1)
+                _dec_sell_in(item)
+                if item.sell_in < 0:
+                    _inc_q(item, 1)
+                continue
+            if item_type == "conjured":
+                _dec_q(item, 2)
+                _dec_sell_in(item)
+                if item.sell_in < 0:
+                    _dec_q(item, 2)
+                continue
+            if item_type == "normal":
+                _dec_q(item, 1)
+                _dec_sell_in(item)
+                if item.sell_in < 0:
+                    _dec_q(item, 1)
+                continue
 
 
 class Item:
