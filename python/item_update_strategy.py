@@ -65,13 +65,17 @@ class _ConjuredNormalStrategy:
             _dec_q(item, 2)
 
 
+_STRATEGIES_COLLECTION: dict[str, type[_Strategy]] = {
+    "sulfuras": _SulfurasStrategy(),
+    "backstage_passes": _BackstagePassesStrategy(),
+    "aged_brie": _AgedBrieStrategy(),
+    "conjured": _ConjuredNormalStrategy(),
+    "normal": _NormalStrategy(),
+}
+
+
 def _pick_strategy(kind: str) -> _Strategy:
-    if kind == "sulfuras":
-        return _SulfurasStrategy()
-    if kind == "backstage_passes":
-        return _BackstagePassesStrategy()
-    if kind == "aged_brie":
-        return _AgedBrieStrategy()
-    if kind == "conjured":
-        return _ConjuredNormalStrategy()
-    return _NormalStrategy()
+    """ Pick appropriate strategy from _STRATEGIES_COLLECTION.
+    Default Normal Strategy if item type has no strategy. """
+
+    return _STRATEGIES_COLLECTION.get(kind, _NormalStrategy())
