@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from item_classifier import classify
+from item_types import ItemType
 
 
-def _clamp_quality(item):
+def _clamp_quality(item, item_type: ItemType):
     """Clamp quality to legal bounds; Sulfuras stays at 80."""
-    item_type = classify(item.name)
-    if item_type == "sulfuras":
+    if item_type is ItemType.SULFURAS:
         return
     if item.quality < 0:
         item.quality = 0
@@ -14,20 +13,19 @@ def _clamp_quality(item):
         item.quality = 50
 
 
-def _dec_sell_in(item):
+def _dec_sell_in(item, item_type: ItemType):
     """Sulfuras is never sold; others decrement."""
-    item_type = classify(item.name)
-    if item_type != "sulfuras":
+    if item_type is not ItemType.SULFURAS:
         item.sell_in -= 1
 
 
-def _inc_q(item, n=1):
+def _inc_q(item, item_type: ItemType, n=1):
     """Increment quality by 1"""
     item.quality += n
-    _clamp_quality(item)
+    _clamp_quality(item, item_type)
 
 
-def _dec_q(item, n=1):
+def _dec_q(item, item_type: ItemType, n=1):
     """Decrement quality by 1"""
     item.quality -= n
-    _clamp_quality(item)
+    _clamp_quality(item, item_type)

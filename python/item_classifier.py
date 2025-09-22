@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import re
-from typing import Literal
-
-ItemKind = Literal["sulfuras", "backstage_passes", "aged_brie", "conjured", "normal"]
+from item_types import ItemType
 
 # Very simple normaliser: collapse whitespace and lowercase
 _ws = re.compile(r"\s+")
@@ -21,25 +19,23 @@ RE_BACKSTAGE_PASSES = _phrase("backstage passes")
 RE_AGED_BRIE = _phrase("aged brie")
 RE_CONJURED = _phrase("conjured")
 
+# Precedence matters (specials first)
+_PATTERNS: list[tuple[re.Pattern, ItemType]] = [
+    (RE_SULFURAS, ItemType.SULFURAS),
+    (RE_BACKSTAGE_PASSES, ItemType.BACKSTAGE_PASSES),
+    (RE_AGED_BRIE, ItemType.AGED_BRIE),
+    (RE_CONJURED, ItemType.CONJURED),
+]
 
-def classify(name: str) -> ItemKind:
+
+def classify(name: str) -> ItemType:
     """
     Phrase-based, case-insensitive item classifier.
-    Returns one of: 'sulfuras' | 'backstage_passes' | 'aged_brie' | 'conjured' | 'normal'.
+    Returns one ItemType.
     """
     n = normalise(name)
 
-    # 1) Special items first
-    if RE_SULFURAS.search(n):
-        return "sulfuras"
-    if RE_BACKSTAGE_PASSES.search(n):
-        return "backstage_passes"
-    if RE_AGED_BRIE.search(n):
-        return "aged_brie"
-
-    # 2) Conjured item
-    if RE_CONJURED.search(n):
-        return "conjured"
-
-    # 3) Default
-    return "normal"
+    for rex, kind in _PATTERNS:
+        if rex.search(n):
+            return kind
+    return ItemType.NORMAL

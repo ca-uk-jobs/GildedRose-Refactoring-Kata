@@ -5,6 +5,7 @@ import unittest
 from gilded_rose import Item
 from item_factory import make_item
 from item_classifier import classify
+from item_types import ItemType as IT
 
 
 class TestItemFactory(unittest.TestCase):
@@ -78,21 +79,21 @@ class TestItemFactory(unittest.TestCase):
 
     # --- Validate classifier
     def test_backstage_passes_phrase_only(self):
-        assert classify("Backstage passes") == "backstage_passes"
-        assert classify("BACKSTAGE   PASSES, VIP") == "backstage_passes"
-        assert classify("backstage pass") == "normal"
-        assert classify("backstage VIP passes") == "normal"
+        assert classify("Backstage passes") is IT.BACKSTAGE_PASSES
+        assert classify("BACKSTAGE   PASSES, VIP") is IT.BACKSTAGE_PASSES
+        assert classify("backstage pass") is IT.NORMAL
+        assert classify("backstage VIP passes") is IT.NORMAL
 
     def test_aged_brie_phrase_only(self):
-        assert classify("AGED BRIE") == "aged_brie"
-        assert classify("brie aged") == "normal"  # phrase must be together (by design)
+        assert classify("AGED BRIE") is IT.AGED_BRIE
+        assert classify("brie aged") is IT.NORMAL  # phrase must be together
 
     def test_sulfuras_anywhere(self):
-        assert classify("sulfuras, hand of ragnaros") == "sulfuras"
-        assert classify("something else sulfuras") == "sulfuras"
+        assert classify("sulfuras, hand of ragnaros") is IT.SULFURAS
+        assert classify("something else sulfuras") is IT.SULFURAS
 
     def test_conjured_token_anywhere(self):
-        assert classify("very CONJURED mana cake") == "conjured"
+        assert classify("very CONJURED mana cake") is IT.CONJURED
 
 
 if __name__ == "__main__":
